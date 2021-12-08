@@ -5,25 +5,23 @@ import ConnectButton from "./ConnectButton";
 
 import { Spacer, Row } from "../styling/global";
 
-const AccountCard = ({ isFirst, account, balance, accountSelectHandler }) => {
-  return (
-    <Card>
-      <Row>
-        <h3>{`${isFirst ? "First" : "Second"} Account:`}</h3>
-        <Spacer width={10} />
-        <p>{account}</p>
-      </Row>
+const AccountCard = ({ isFirst, account, balance, accountSelectHandler }) => (
+  <Card>
+    <Row>
+      <h3>{`${isFirst ? "First" : "Second"} Account:`}</h3>
+      <Spacer width={10} />
+      <p>{account}</p>
+    </Row>
 
-      <Row>
-        <h3>{"Balance:"}</h3>
-        <Spacer width={10} />
-        <p>{`${balance} ETH`}</p>
-      </Row>
+    <Row>
+      <h3>{"Balance:"}</h3>
+      <Spacer width={10} />
+      <p>{`${balance} ETH`}</p>
+    </Row>
 
-      <ConnectButton label={"Change Account"} onClick={accountSelectHandler} />
-    </Card>
-  );
-};
+    <ConnectButton label={"Change Account"} onClick={accountSelectHandler} />
+  </Card>
+);
 
 export default AccountCard;
 

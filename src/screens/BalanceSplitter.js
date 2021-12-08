@@ -25,9 +25,9 @@ const BalanceSplitter = () => {
   const [errorMessage, setErrorMessage] = useState(false);
   const [successMessage, setSuccessMessage] = useState(false);
 
-  // automatically hides any error message after 2 seconds
+  // automatically hides any error message after 3 seconds
   useEffect(() => {
-    setTimeout(() => setErrorMessage(false), 2000);
+    setTimeout(() => setErrorMessage(false), 3000);
   }, [errorMessage]);
 
   // requests permission to wallet to select a new account
@@ -92,6 +92,14 @@ const BalanceSplitter = () => {
     }
   };
 
+  const dappReset = () => {
+    const tempAccounts = [initialAccount, initialAccount];
+    setAccounts([...tempAccounts]);
+    setErrorMessage(false);
+    setSuccessMessage(false);
+    setIsConnected(window.ethereum?.isConnected());
+  };
+
   // splits the balance between the two accounts
   const splitBalance = async () => {
     // average balance between the two accounts
@@ -119,9 +127,15 @@ const BalanceSplitter = () => {
         `Please select the first account:\n\nAccount: ${accounts[FIRST].id}\nBalance: ${accounts[FIRST].balance} ETH`
       );
 
-      requestNewAccount();
+      let account;
+
+      // makes sure that selected account is the right one
+      while (!account || account[0] !== accounts[FIRST].id) {
+        account = await requestNewAccount();
+      }
     }
 
+    // ETH transaction
     try {
       const tx = await signer.sendTransaction({
         from: fromAccount,
@@ -134,10 +148,10 @@ const BalanceSplitter = () => {
       // restarts the dapp after 5 seconds
       setTimeout(() => {
         setSuccessMessage(false);
-        window.location.reload();
+        dappReset();
       }, 5000);
     } catch (error) {
-      console.warn("ERROR:", error);
+      setErrorMessage(`ERROR: ${JSON.stringify(error)}`);
     }
   };
 

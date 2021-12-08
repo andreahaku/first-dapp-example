@@ -2,13 +2,11 @@ import React from "react";
 
 import styled from "styled-components";
 
-const ConnectButton = ({ label, onClick }) => {
-  return (
-    <StyledConnectButton onClick={onClick}>
-      <h3>{label}</h3>
-    </StyledConnectButton>
-  );
-};
+const ConnectButton = ({ label, onClick }) => (
+  <StyledConnectButton onClick={onClick}>
+    <h3>{label}</h3>
+  </StyledConnectButton>
+);
 
 export default ConnectButton;
 
