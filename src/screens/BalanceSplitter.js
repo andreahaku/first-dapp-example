@@ -129,7 +129,11 @@ const BalanceSplitter = () => {
 
       let account;
 
+<<<<<<< HEAD
       // makes sure that selected account is the right one
+=======
+      // checks if the selected account is the right one
+>>>>>>> 73d3b7d6e2d7cff264d75fe160d60bf9bd03104b
       while (!account || account[0] !== accounts[FIRST].id) {
         account = await requestNewAccount();
       }
