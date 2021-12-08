@@ -1,20 +1,26 @@
 import React, { useState, useEffect } from "react";
+
 import { ethers } from "ethers";
+import styled from "styled-components";
 
 import ConnectButton from "../components/ConnectButton";
 import AccountCard from "../components/AccountCard";
-
-import styled from "styled-components";
 import ConnectionStatus from "../components/ConnectionStatus";
+
+import { Spacer, Row } from "../styling/global";
+
+const initialAccount = {
+  id: "",
+  balance: 0,
+};
+
+const FIRST = 0;
+const SECOND = 1;
 
 const BalanceSplitter = () => {
   const [isConnected, setIsConnected] = useState(false);
 
-  const [firstAccountId, setFirstAccountId] = useState(false);
-  const [firstAccountBalance, setFirstAccountBalance] = useState(0);
-
-  const [secondAccountId, setSecondAccountId] = useState(false);
-  const [secondAccountBalance, setSecondAccountBalance] = useState(0);
+  const [accounts, setAccounts] = useState([initialAccount, initialAccount]);
 
   const [errorMessage, setErrorMessage] = useState(false);
 
@@ -27,8 +33,10 @@ const BalanceSplitter = () => {
   const selectAccount = async (isFirst = true, isReset = false) => {
     if (typeof window.ethereum !== "undefined") {
       const { ethereum } = window;
+
       setIsConnected(ethereum.isConnected());
 
+      // gets selected account
       let account = await ethereum.request({
         method: "eth_requestAccounts",
       });
@@ -44,7 +52,7 @@ const BalanceSplitter = () => {
           ],
         });
 
-        // updates requested account
+        // asks to select a new account
         account = await ethereum.request({
           method: "eth_requestAccounts",
           params: [
@@ -61,13 +69,14 @@ const BalanceSplitter = () => {
         params: [account[0], "latest"],
       });
 
-      if (isFirst) {
-        setFirstAccountId(account[0]);
-        setFirstAccountBalance(ethers.utils.formatEther(balance));
-      } else {
-        setSecondAccountId(account[0]);
-        setSecondAccountBalance(ethers.utils.formatEther(balance));
-      }
+      const tempAccount = [...accounts];
+
+      tempAccount[isFirst ? FIRST : SECOND] = {
+        id: account[0],
+        balance: parseFloat(ethers.utils.formatEther(balance)),
+      };
+
+      setAccounts([...tempAccount]);
     } else {
       setErrorMessage("Please, install MetaMask");
     }
@@ -92,26 +101,26 @@ const BalanceSplitter = () => {
           <h5>{"Select accounts to be balanced"}</h5>
 
           <CardsContainer>
-            {firstAccountId && (
+            {accounts[FIRST].id && (
               <AccountCard
                 isFirst
-                account={firstAccountId}
-                balance={firstAccountBalance}
+                account={accounts[FIRST].id}
+                balance={accounts[FIRST].balance}
                 accountSelectHandler={() => selectAccount(true, true)}
               />
             )}
 
             <Spacer height={10} />
 
-            {firstAccountId && !secondAccountId ? (
+            {accounts[FIRST].id && !accounts[SECOND].id ? (
               <ConnectButton
                 label={"Select SECOND Account"}
                 onClick={() => selectAccount(false)}
               />
             ) : (
               <AccountCard
-                account={secondAccountId}
-                balance={secondAccountBalance}
+                account={accounts[SECOND].id}
+                balance={accounts[SECOND].balance}
                 accountSelectHandler={() => selectAccount(false, true)}
               />
             )}
@@ -119,14 +128,14 @@ const BalanceSplitter = () => {
         </>
       )}
 
-      {firstAccountId && secondAccountId && (
+      {accounts[FIRST].id && accounts[SECOND].id && (
         <>
           <Row>
             <h3>{"Average Balance:"}</h3>
             <Spacer width={10} />
             <p>{`${
-              (parseFloat(firstAccountBalance) +
-                parseFloat(secondAccountBalance)) /
+              (parseFloat(accounts[FIRST].balance) +
+                parseFloat(accounts[SECOND].balance)) /
               2
             } ETH`}</p>
           </Row>
@@ -151,18 +160,4 @@ const CardsContainer = styled.div`
   justify-content: center;
   align-items: center;
   margin: 2rem;
-`;
-
-const Spacer = styled.div`
-  ${({ height, width }) => `
-    height: ${(height || "10") + "px"};
-    width: ${(width || "10") + "px"};
-  `}
-`;
-
-const Row = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
 `;

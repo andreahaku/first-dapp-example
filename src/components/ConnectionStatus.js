@@ -1,6 +1,7 @@
 import React from "react";
-
 import styled from "styled-components";
+
+import { Spacer } from "../styling/global";
 
 const ConnectionStatus = ({ isConnected }) => {
   return (
@@ -19,11 +20,4 @@ const StatusRow = styled.div`
   flex-direction: row;
   justify-content: center;
   align-items: center;
-`;
-
-const Spacer = styled.div`
-  ${({ height, width }) => `
-    height: ${(height || "10") + "px"};
-    width: ${(width || "10") + "px"};
-  `}
 `;
